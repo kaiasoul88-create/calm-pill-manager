@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
 import { Route as AuthenticatedMedicamentosRouteImport } from './routes/_authenticated/medicamentos'
 import { Route as AuthenticatedMedicamentosIndexRouteImport } from './routes/_authenticated/medicamentos.index'
+import { Route as AuthenticatedMedicamentosNuevoRouteImport } from './routes/_authenticated/medicamentos.nuevo'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -47,18 +48,26 @@ const AuthenticatedMedicamentosIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedMedicamentosRoute,
   } as any)
+const AuthenticatedMedicamentosNuevoRoute =
+  AuthenticatedMedicamentosNuevoRouteImport.update({
+    id: '/nuevo',
+    path: '/nuevo',
+    getParentRoute: () => AuthenticatedMedicamentosRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/medicamentos': typeof AuthenticatedMedicamentosRouteWithChildren
+  '/medicamentos/nuevo': typeof AuthenticatedMedicamentosNuevoRoute
   '/medicamentos/': typeof AuthenticatedMedicamentosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/medicamentos/nuevo': typeof AuthenticatedMedicamentosNuevoRoute
   '/medicamentos': typeof AuthenticatedMedicamentosIndexRoute
 }
 export interface FileRoutesById {
@@ -68,13 +77,20 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
   '/_authenticated/medicamentos': typeof AuthenticatedMedicamentosRouteWithChildren
+  '/_authenticated/medicamentos/nuevo': typeof AuthenticatedMedicamentosNuevoRoute
   '/_authenticated/medicamentos/': typeof AuthenticatedMedicamentosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/inicio' | '/medicamentos' | '/medicamentos/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/inicio'
+    | '/medicamentos'
+    | '/medicamentos/nuevo'
+    | '/medicamentos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/inicio' | '/medicamentos'
+  to: '/' | '/auth' | '/inicio' | '/medicamentos/nuevo' | '/medicamentos'
   id:
     | '__root__'
     | '/'
@@ -82,6 +98,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/inicio'
     | '/_authenticated/medicamentos'
+    | '/_authenticated/medicamentos/nuevo'
     | '/_authenticated/medicamentos/'
   fileRoutesById: FileRoutesById
 }
@@ -135,15 +152,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMedicamentosIndexRouteImport
       parentRoute: typeof AuthenticatedMedicamentosRoute
     }
+    '/_authenticated/medicamentos/nuevo': {
+      id: '/_authenticated/medicamentos/nuevo'
+      path: '/nuevo'
+      fullPath: '/medicamentos/nuevo'
+      preLoaderRoute: typeof AuthenticatedMedicamentosNuevoRouteImport
+      parentRoute: typeof AuthenticatedMedicamentosRoute
+    }
   }
 }
 
 interface AuthenticatedMedicamentosRouteChildren {
+  AuthenticatedMedicamentosNuevoRoute: typeof AuthenticatedMedicamentosNuevoRoute
   AuthenticatedMedicamentosIndexRoute: typeof AuthenticatedMedicamentosIndexRoute
 }
 
 const AuthenticatedMedicamentosRouteChildren: AuthenticatedMedicamentosRouteChildren =
   {
+    AuthenticatedMedicamentosNuevoRoute: AuthenticatedMedicamentosNuevoRoute,
     AuthenticatedMedicamentosIndexRoute: AuthenticatedMedicamentosIndexRoute,
   }
 
