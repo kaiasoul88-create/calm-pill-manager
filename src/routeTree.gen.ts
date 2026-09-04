@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedHistorialRouteImport } from './routes/_authenticated/historial'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
 import { Route as AuthenticatedMedicamentosRouteImport } from './routes/_authenticated/medicamentos'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedMedicamentosIndexRouteImport } from './routes/_authenticated/medicamentos.index'
 import { Route as AuthenticatedMedicamentosIdRouteImport } from './routes/_authenticated/medicamentos.$id'
 import { Route as AuthenticatedMedicamentosNuevoRouteImport } from './routes/_authenticated/medicamentos.nuevo'
@@ -49,6 +50,11 @@ const AuthenticatedMedicamentosRoute =
     path: '/medicamentos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMedicamentosIndexRoute =
   AuthenticatedMedicamentosIndexRouteImport.update({
     id: '/',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/historial': typeof AuthenticatedHistorialRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/medicamentos': typeof AuthenticatedMedicamentosRouteWithChildren
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/medicamentos/$id': typeof AuthenticatedMedicamentosIdRoute
   '/medicamentos/nuevo': typeof AuthenticatedMedicamentosNuevoRoute
   '/medicamentos/': typeof AuthenticatedMedicamentosIndexRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/historial': typeof AuthenticatedHistorialRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/medicamentos/$id': typeof AuthenticatedMedicamentosIdRoute
   '/medicamentos/nuevo': typeof AuthenticatedMedicamentosNuevoRoute
   '/medicamentos': typeof AuthenticatedMedicamentosIndexRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/_authenticated/historial': typeof AuthenticatedHistorialRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
   '/_authenticated/medicamentos': typeof AuthenticatedMedicamentosRouteWithChildren
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/medicamentos/$id': typeof AuthenticatedMedicamentosIdRoute
   '/_authenticated/medicamentos/nuevo': typeof AuthenticatedMedicamentosNuevoRoute
   '/_authenticated/medicamentos/': typeof AuthenticatedMedicamentosIndexRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/historial'
     | '/inicio'
     | '/medicamentos'
+    | '/perfil'
     | '/medicamentos/$id'
     | '/medicamentos/nuevo'
     | '/medicamentos/'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/historial'
     | '/inicio'
+    | '/perfil'
     | '/medicamentos/$id'
     | '/medicamentos/nuevo'
     | '/medicamentos'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/_authenticated/historial'
     | '/_authenticated/inicio'
     | '/_authenticated/medicamentos'
+    | '/_authenticated/perfil'
     | '/_authenticated/medicamentos/$id'
     | '/_authenticated/medicamentos/nuevo'
     | '/_authenticated/medicamentos/'
@@ -182,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMedicamentosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/medicamentos/': {
       id: '/_authenticated/medicamentos/'
       path: '/'
@@ -228,12 +247,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHistorialRoute: typeof AuthenticatedHistorialRoute
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
   AuthenticatedMedicamentosRoute: typeof AuthenticatedMedicamentosRouteWithChildren
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHistorialRoute: AuthenticatedHistorialRoute,
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
   AuthenticatedMedicamentosRoute: AuthenticatedMedicamentosRouteWithChildren,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
