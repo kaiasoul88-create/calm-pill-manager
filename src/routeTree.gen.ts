@@ -10,33 +10,144 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedHistorialRouteImport } from './routes/_authenticated/historial'
+import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
+import { Route as AuthenticatedMedicamentosRouteImport } from './routes/_authenticated/medicamentos'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedMedicamentosIndexRouteImport } from './routes/_authenticated/medicamentos.index'
+import { Route as AuthenticatedMedicamentosIdRouteImport } from './routes/_authenticated/medicamentos.$id'
+import { Route as AuthenticatedMedicamentosNuevoRouteImport } from './routes/_authenticated/medicamentos.nuevo'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedHistorialRoute = AuthenticatedHistorialRouteImport.update({
+  id: '/historial',
+  path: '/historial',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInicioRoute = AuthenticatedInicioRouteImport.update({
+  id: '/inicio',
+  path: '/inicio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMedicamentosRoute =
+  AuthenticatedMedicamentosRouteImport.update({
+    id: '/medicamentos',
+    path: '/medicamentos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMedicamentosIndexRoute =
+  AuthenticatedMedicamentosIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedMedicamentosRoute,
+  } as any)
+const AuthenticatedMedicamentosIdRoute =
+  AuthenticatedMedicamentosIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedMedicamentosRoute,
+  } as any)
+const AuthenticatedMedicamentosNuevoRoute =
+  AuthenticatedMedicamentosNuevoRouteImport.update({
+    id: '/nuevo',
+    path: '/nuevo',
+    getParentRoute: () => AuthenticatedMedicamentosRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/historial': typeof AuthenticatedHistorialRoute
+  '/inicio': typeof AuthenticatedInicioRoute
+  '/medicamentos': typeof AuthenticatedMedicamentosRouteWithChildren
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/medicamentos/$id': typeof AuthenticatedMedicamentosIdRoute
+  '/medicamentos/nuevo': typeof AuthenticatedMedicamentosNuevoRoute
+  '/medicamentos/': typeof AuthenticatedMedicamentosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/historial': typeof AuthenticatedHistorialRoute
+  '/inicio': typeof AuthenticatedInicioRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/medicamentos/$id': typeof AuthenticatedMedicamentosIdRoute
+  '/medicamentos/nuevo': typeof AuthenticatedMedicamentosNuevoRoute
+  '/medicamentos': typeof AuthenticatedMedicamentosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/historial': typeof AuthenticatedHistorialRoute
+  '/_authenticated/inicio': typeof AuthenticatedInicioRoute
+  '/_authenticated/medicamentos': typeof AuthenticatedMedicamentosRouteWithChildren
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/medicamentos/$id': typeof AuthenticatedMedicamentosIdRoute
+  '/_authenticated/medicamentos/nuevo': typeof AuthenticatedMedicamentosNuevoRoute
+  '/_authenticated/medicamentos/': typeof AuthenticatedMedicamentosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/historial'
+    | '/inicio'
+    | '/medicamentos'
+    | '/perfil'
+    | '/medicamentos/$id'
+    | '/medicamentos/nuevo'
+    | '/medicamentos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/historial'
+    | '/inicio'
+    | '/perfil'
+    | '/medicamentos/$id'
+    | '/medicamentos/nuevo'
+    | '/medicamentos'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/historial'
+    | '/_authenticated/inicio'
+    | '/_authenticated/medicamentos'
+    | '/_authenticated/perfil'
+    | '/_authenticated/medicamentos/$id'
+    | '/_authenticated/medicamentos/nuevo'
+    | '/_authenticated/medicamentos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +159,111 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/historial': {
+      id: '/_authenticated/historial'
+      path: '/historial'
+      fullPath: '/historial'
+      preLoaderRoute: typeof AuthenticatedHistorialRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inicio': {
+      id: '/_authenticated/inicio'
+      path: '/inicio'
+      fullPath: '/inicio'
+      preLoaderRoute: typeof AuthenticatedInicioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/medicamentos': {
+      id: '/_authenticated/medicamentos'
+      path: '/medicamentos'
+      fullPath: '/medicamentos'
+      preLoaderRoute: typeof AuthenticatedMedicamentosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/medicamentos/': {
+      id: '/_authenticated/medicamentos/'
+      path: '/'
+      fullPath: '/medicamentos/'
+      preLoaderRoute: typeof AuthenticatedMedicamentosIndexRouteImport
+      parentRoute: typeof AuthenticatedMedicamentosRoute
+    }
+    '/_authenticated/medicamentos/$id': {
+      id: '/_authenticated/medicamentos/$id'
+      path: '/$id'
+      fullPath: '/medicamentos/$id'
+      preLoaderRoute: typeof AuthenticatedMedicamentosIdRouteImport
+      parentRoute: typeof AuthenticatedMedicamentosRoute
+    }
+    '/_authenticated/medicamentos/nuevo': {
+      id: '/_authenticated/medicamentos/nuevo'
+      path: '/nuevo'
+      fullPath: '/medicamentos/nuevo'
+      preLoaderRoute: typeof AuthenticatedMedicamentosNuevoRouteImport
+      parentRoute: typeof AuthenticatedMedicamentosRoute
+    }
   }
 }
 
+interface AuthenticatedMedicamentosRouteChildren {
+  AuthenticatedMedicamentosIdRoute: typeof AuthenticatedMedicamentosIdRoute
+  AuthenticatedMedicamentosNuevoRoute: typeof AuthenticatedMedicamentosNuevoRoute
+  AuthenticatedMedicamentosIndexRoute: typeof AuthenticatedMedicamentosIndexRoute
+}
+
+const AuthenticatedMedicamentosRouteChildren: AuthenticatedMedicamentosRouteChildren =
+  {
+    AuthenticatedMedicamentosIdRoute: AuthenticatedMedicamentosIdRoute,
+    AuthenticatedMedicamentosNuevoRoute: AuthenticatedMedicamentosNuevoRoute,
+    AuthenticatedMedicamentosIndexRoute: AuthenticatedMedicamentosIndexRoute,
+  }
+
+const AuthenticatedMedicamentosRouteWithChildren =
+  AuthenticatedMedicamentosRoute._addFileChildren(
+    AuthenticatedMedicamentosRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedHistorialRoute: typeof AuthenticatedHistorialRoute
+  AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
+  AuthenticatedMedicamentosRoute: typeof AuthenticatedMedicamentosRouteWithChildren
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedHistorialRoute: AuthenticatedHistorialRoute,
+  AuthenticatedInicioRoute: AuthenticatedInicioRoute,
+  AuthenticatedMedicamentosRoute: AuthenticatedMedicamentosRouteWithChildren,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
