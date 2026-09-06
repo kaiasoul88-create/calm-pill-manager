@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Home, Pill, ClipboardList, User } from "lucide-react";
+import { useProfile } from "@/lib/data";
+import { applyTextSize } from "@/lib/text-size";
 
 const NAV = [
   { to: "/inicio", label: "Inicio", Icon: Home },
