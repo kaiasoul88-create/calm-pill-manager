@@ -12,6 +12,12 @@ const NAV = [
 ] as const;
 
 export function AppShell({ title, children }: { title: string; children: ReactNode }) {
+  const { data: profile } = useProfile();
+
+  useEffect(() => {
+    if (profile?.text_size) applyTextSize(profile.text_size);
+  }, [profile?.text_size]);
+
   return (
     <div className="min-h-screen bg-background pb-28">
       <a
