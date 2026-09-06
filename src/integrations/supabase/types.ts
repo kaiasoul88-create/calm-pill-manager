@@ -181,6 +181,80 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          last_error: string | null
+          last_seen_at: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          last_error?: string | null
+          last_seen_at?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          last_error?: string | null
+          last_seen_at?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reminder_sends: {
+        Row: {
+          id: string
+          kind: string
+          medication_id: string
+          scheduled_date: string
+          scheduled_time: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          kind?: string
+          medication_id: string
+          scheduled_date: string
+          scheduled_time: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          kind?: string
+          medication_id?: string
+          scheduled_date?: string
+          scheduled_time?: string
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminder_sends_medication_id_fkey"
+            columns: ["medication_id"]
+            isOneToOne: false
+            referencedRelation: "medications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
