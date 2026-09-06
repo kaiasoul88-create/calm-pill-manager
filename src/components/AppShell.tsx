@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Home, Pill, ClipboardList, User } from "lucide-react";
+import { useProfile } from "@/lib/data";
+import { applyTextSize } from "@/lib/text-size";
 
 const NAV = [
   { to: "/inicio", label: "Inicio", Icon: Home },
@@ -10,6 +12,12 @@ const NAV = [
 ] as const;
 
 export function AppShell({ title, children }: { title: string; children: ReactNode }) {
+  const { data: profile } = useProfile();
+
+  useEffect(() => {
+    if (profile?.text_size) applyTextSize(profile.text_size);
+  }, [profile?.text_size]);
+
   return (
     <div className="min-h-screen bg-background pb-28">
       <a
