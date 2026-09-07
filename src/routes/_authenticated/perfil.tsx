@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfile, useUpdateProfile } from "@/lib/data";
 import { DISCLAIMER } from "@/lib/pastillero";
 import { applyTextSize } from "@/lib/text-size";
+import { activarAvisos, desactivarAvisos, suscripcionActual } from "@/lib/push-client";
+import { sendTestPush } from "@/lib/push.functions";
 
 const TAMANOS = [
   { v: "normal", label: "Normal" },
@@ -33,6 +35,8 @@ function Perfil() {
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const [timezone, setTimezone] = useState("");
+  const [avisosActivos, setAvisosActivos] = useState(false);
+  const [ocupado, setOcupado] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -41,7 +45,13 @@ function Perfil() {
     }
   }, [profile]);
 
-  const avisoNavegador = profile?.notification_preferences?.browser ?? false;
+  useEffect(() => {
+    suscripcionActual()
+      .then((s) => setAvisosActivos(Boolean(s)))
+      .catch(() => setAvisosActivos(false));
+  }, []);
+
+
 
   return (
     <AppShell title="Perfil">
