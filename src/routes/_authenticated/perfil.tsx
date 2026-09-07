@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfile, useUpdateProfile } from "@/lib/data";
 import { DISCLAIMER } from "@/lib/pastillero";
 import { applyTextSize } from "@/lib/text-size";
+import { activarAvisos, desactivarAvisos, suscripcionActual } from "@/lib/push-client";
+import { sendTestPush } from "@/lib/push.functions";
 
 const TAMANOS = [
   { v: "normal", label: "Normal" },
@@ -33,6 +35,8 @@ function Perfil() {
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const [timezone, setTimezone] = useState("");
+  const [avisosActivos, setAvisosActivos] = useState(false);
+  const [ocupado, setOcupado] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -41,7 +45,13 @@ function Perfil() {
     }
   }, [profile]);
 
-  const avisoNavegador = profile?.notification_preferences?.browser ?? false;
+  useEffect(() => {
+    suscripcionActual()
+      .then((s) => setAvisosActivos(Boolean(s)))
+      .catch(() => setAvisosActivos(false));
+  }, []);
+
+
 
   return (
     <AppShell title="Perfil">
@@ -122,43 +132,84 @@ function Perfil() {
 
       <section aria-labelledby="avisos" className="card-surface mt-6 p-6">
         <h2 id="avisos" className="text-lg font-semibold">
-          Avisos
+          Avisos en este dispositivo
         </h2>
         <p className="mt-2 text-base text-muted-foreground">
-          Mientras la aplicación esté abierta, te mostramos un aviso cuando llegue la hora. Si
-          activas los avisos del teléfono o del computador, también te avisamos con una notificación
-          cuando la aplicación esté abierta. Los avisos con la aplicación cerrada todavía no están
-          disponibles.
+          Si los activas, te avisamos a la hora de cada medicamento aunque tengas la aplicación
+          cerrada. Debes activarlos una vez en cada teléfono o computador que uses.
         </p>
+
         <button
           type="button"
-          aria-pressed={avisoNavegador}
+          aria-pressed={avisosActivos}
+          disabled={ocupado}
           onClick={async () => {
-            if (!avisoNavegador) {
-              if (typeof Notification === "undefined") {
-                toast.error("Este dispositivo no permite avisos.");
+            setOcupado(true);
+            try {
+              if (avisosActivos) {
+                await desactivarAvisos();
+                await actualizar.mutateAsync({
+                  notification_preferences: { in_app: true, browser: false },
+                });
+                setAvisosActivos(false);
+                toast.success("Listo. Ya no te avisaremos en este dispositivo.");
                 return;
               }
-              const permiso = await Notification.requestPermission();
-              if (permiso !== "granted") {
-                toast.error("No nos diste permiso para avisarte.");
-                return;
+              const estado = await activarAvisos();
+              if (estado === "activado") {
+                await actualizar.mutateAsync({
+                  notification_preferences: { in_app: true, browser: true },
+                });
+                setAvisosActivos(true);
+                toast.success("Listo. Te avisaremos a la hora de cada medicamento.");
+              } else if (estado === "abrir-en-pestana") {
+                toast.error(
+                  "Para activar los avisos, abre la aplicación en su propia ventana, no dentro de esta vista previa.",
+                );
+              } else if (estado === "sin-permiso") {
+                toast.error(
+                  "Tu navegador bloqueó los avisos. Puedes permitirlos en la configuración del sitio.",
+                );
+              } else if (estado === "no-compatible") {
+                toast.error("Este dispositivo o navegador no permite avisos.");
+              } else {
+                toast.error("Los avisos no están disponibles por ahora.");
               }
+            } catch {
+              toast.error("No pudimos activar los avisos. Intenta otra vez.");
+            } finally {
+              setOcupado(false);
             }
-            await actualizar.mutateAsync({
-              notification_preferences: { in_app: true, browser: !avisoNavegador },
-            });
-            toast.success(avisoNavegador ? "Avisos desactivados." : "Avisos activados.");
           }}
           className={`mt-4 min-h-16 w-full rounded-xl border-2 text-lg font-semibold ${
-            avisoNavegador
+            avisosActivos
               ? "border-primary bg-primary text-primary-foreground"
               : "border-input bg-background"
           }`}
         >
-          {avisoNavegador ? "✔ Avisos activados" : "Activar avisos en este dispositivo"}
+          {avisosActivos ? "✔ Avisos activados" : "Activar avisos en este dispositivo"}
         </button>
+
+        {avisosActivos && (
+          <button
+            type="button"
+            disabled={ocupado}
+            onClick={async () => {
+              const r = await sendTestPush({ data: undefined });
+              if (r.sent > 0) toast.success("Te enviamos un aviso de prueba.");
+              else toast.error("No pudimos enviar el aviso de prueba.");
+            }}
+            className="mt-3 min-h-14 w-full rounded-xl border-2 border-input bg-background text-lg font-semibold"
+          >
+            Enviar un aviso de prueba
+          </button>
+        )}
+
+        <p className="mt-3 text-base text-muted-foreground">
+          También te mostramos un aviso dentro de la aplicación cuando la tienes abierta.
+        </p>
       </section>
+
 
       <section className="card-surface mt-6 p-6">
         <button

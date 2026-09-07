@@ -19,6 +19,7 @@ import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedMedicamentosIndexRouteImport } from './routes/_authenticated/medicamentos.index'
 import { Route as AuthenticatedMedicamentosIdRouteImport } from './routes/_authenticated/medicamentos.$id'
 import { Route as AuthenticatedMedicamentosNuevoRouteImport } from './routes/_authenticated/medicamentos.nuevo'
+import { Route as ApiPublicRemindersRunRouteImport } from './routes/api/public/reminders/run'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -73,6 +74,11 @@ const AuthenticatedMedicamentosNuevoRoute =
     path: '/nuevo',
     getParentRoute: () => AuthenticatedMedicamentosRoute,
   } as any)
+const ApiPublicRemindersRunRoute = ApiPublicRemindersRunRouteImport.update({
+  id: '/api/public/reminders/run',
+  path: '/api/public/reminders/run',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/medicamentos/$id': typeof AuthenticatedMedicamentosIdRoute
   '/medicamentos/nuevo': typeof AuthenticatedMedicamentosNuevoRoute
   '/medicamentos/': typeof AuthenticatedMedicamentosIndexRoute
+  '/api/public/reminders/run': typeof ApiPublicRemindersRunRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/medicamentos/$id': typeof AuthenticatedMedicamentosIdRoute
   '/medicamentos/nuevo': typeof AuthenticatedMedicamentosNuevoRoute
   '/medicamentos': typeof AuthenticatedMedicamentosIndexRoute
+  '/api/public/reminders/run': typeof ApiPublicRemindersRunRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/_authenticated/medicamentos/$id': typeof AuthenticatedMedicamentosIdRoute
   '/_authenticated/medicamentos/nuevo': typeof AuthenticatedMedicamentosNuevoRoute
   '/_authenticated/medicamentos/': typeof AuthenticatedMedicamentosIndexRoute
+  '/api/public/reminders/run': typeof ApiPublicRemindersRunRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/medicamentos/$id'
     | '/medicamentos/nuevo'
     | '/medicamentos/'
+    | '/api/public/reminders/run'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/medicamentos/$id'
     | '/medicamentos/nuevo'
     | '/medicamentos'
+    | '/api/public/reminders/run'
   id:
     | '__root__'
     | '/'
@@ -142,12 +153,14 @@ export interface FileRouteTypes {
     | '/_authenticated/medicamentos/$id'
     | '/_authenticated/medicamentos/nuevo'
     | '/_authenticated/medicamentos/'
+    | '/api/public/reminders/run'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicRemindersRunRoute: typeof ApiPublicRemindersRunRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -222,6 +235,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMedicamentosNuevoRouteImport
       parentRoute: typeof AuthenticatedMedicamentosRoute
     }
+    '/api/public/reminders/run': {
+      id: '/api/public/reminders/run'
+      path: '/api/public/reminders/run'
+      fullPath: '/api/public/reminders/run'
+      preLoaderRoute: typeof ApiPublicRemindersRunRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicRemindersRunRoute: ApiPublicRemindersRunRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { DoseItem } from "@/components/DoseItem";
 import { useDoses, useMarkTaken, useMedications, useProfile, useSchedules, useSnooze } from "@/lib/data";
 import { buildDosesForDate, dateKey, formatTime, isDoseDue, nextDose } from "@/lib/pastillero";
+import { suscripcionActual } from "@/lib/push-client";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({
@@ -54,9 +55,26 @@ function Inicio() {
 
   const nombre = profile?.name?.split(" ")[0] ?? "";
 
+  const [sinAvisos, setSinAvisos] = useState(false);
+  useEffect(() => {
+    suscripcionActual()
+      .then((s) => setSinAvisos(!s))
+      .catch(() => setSinAvisos(false));
+  }, []);
+
   return (
     <AppShell title="Inicio">
       <h1 className="text-2xl font-bold">Hola{nombre ? `, ${nombre}` : ""} 👋</h1>
+
+      {sinAvisos && (
+        <Link
+          to="/perfil"
+          className="card-surface mt-4 flex min-h-16 items-center gap-3 p-4 text-lg font-semibold"
+        >
+          🔔 Activa los avisos para que te recordemos aunque la aplicación esté cerrada.
+        </Link>
+      )}
+
 
       <section aria-labelledby="proxima-toma" className="mt-5">
         <h2
