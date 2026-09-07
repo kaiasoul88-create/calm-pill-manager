@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { DoseItem } from "@/components/DoseItem";
 import { useDoses, useMarkTaken, useMedications, useProfile, useSchedules, useSnooze } from "@/lib/data";
 import { buildDosesForDate, dateKey, formatTime, isDoseDue, nextDose } from "@/lib/pastillero";
+import { suscripcionActual } from "@/lib/push-client";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({
