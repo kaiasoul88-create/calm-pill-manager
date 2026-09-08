@@ -17,6 +17,7 @@ self.addEventListener("push", (event) => {
     badge: "/icons/badge-96.png",
     tag: data.tag || "pastillero",
     renotify: true,
+    silent: false,
     requireInteraction: true,
     vibrate: [200, 100, 200],
     data: { url: data.url || "/inicio" },
