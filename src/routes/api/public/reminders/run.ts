@@ -69,7 +69,10 @@ export const Route = createFileRoute("/api/public/reminders/run")({
           .eq("key", "reminders_token")
           .maybeSingle();
         const esperado = (config as { value?: string } | null)?.value;
-        if (!token || !esperado || token !== esperado) {
+        const secretoCron = process.env["LOVABLE_CRON_SECRET"];
+        const autorizado =
+          !!token && ((!!esperado && token === esperado) || (!!secretoCron && token === secretoCron));
+        if (!autorizado) {
           return new Response("Unauthorized", { status: 401 });
         }
 
