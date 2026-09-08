@@ -76,7 +76,6 @@ export const Route = createFileRoute("/api/public/reminders/run")({
         if (!hasPushConfig()) return Response.json({ ok: false, reason: "sin-claves" });
 
 
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
         const { data: subsData } = await supabaseAdmin
           .from("push_subscriptions")
