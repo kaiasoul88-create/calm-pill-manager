@@ -58,12 +58,23 @@ export const Route = createFileRoute("/api/public/reminders/run")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const { authenticateCronRequest } = await import("@/integrations/supabase/cron-auth");
-        const noAutorizado = await authenticateCronRequest(request);
-        if (noAutorizado) return noAutorizado;
-
         const { sendWebPush, hasPushConfig } = await import("@/lib/webpush.server");
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+        // Solo el programador interno puede pedir el envío de avisos.
+        const token = /^Bearer ([^\s,]+)$/.exec(request.headers.get("authorization") ?? "")?.[1];
+        const { data: config } = await supabaseAdmin
+          .from("app_config")
+          .select("value")
+          .eq("key", "reminders_token")
+          .maybeSingle();
+        const esperado = (config as { value?: string } | null)?.value;
+        if (!token || !esperado || token !== esperado) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+
         if (!hasPushConfig()) return Response.json({ ok: false, reason: "sin-claves" });
+
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
