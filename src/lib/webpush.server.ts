@@ -96,7 +96,7 @@ async function vapidAuthorization(endpoint: string): Promise<string> {
   return `vapid t=${unsigned}.${bytesToB64Url(signature)}, k=${config.publicKey}`;
 }
 
-async function encryptPayload(target: PushTarget, payload: string) {
+export async function encryptPayload(target: PushTarget, payload: string) {
   const uaPublicBytes = b64UrlToBytes(target.p256dh);
   const authSecret = b64UrlToBytes(target.auth);
 
