@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-type Subscripcion = { endpoint: string; p256dh: string; auth: string; user_id: string };
+type Subscripcion = { id: string; endpoint: string; p256dh: string; auth: string; user_id: string };
 type Perfil = { id: string; timezone: string; notification_preferences: { browser?: boolean } | null };
 type Med = {
   id: string;
@@ -82,7 +82,7 @@ export const Route = createFileRoute("/api/public/reminders/run")({
 
         const { data: subsData } = await supabaseAdmin
           .from("push_subscriptions")
-          .select("endpoint, p256dh, auth, user_id");
+          .select("id, endpoint, p256dh, auth, user_id");
         const subs = (subsData ?? []) as Subscripcion[];
         if (subs.length === 0) return Response.json({ ok: true, enviados: 0 });
 
@@ -220,6 +220,15 @@ export const Route = createFileRoute("/api/public/reminders/run")({
                 url: `/inicio?medicamento=${encodeURIComponent(p.medId)}&fecha=${encodeURIComponent(p.fecha)}&hora=${encodeURIComponent(p.hora)}`,
               tag: `${p.medId}-${p.fecha}-${p.hora}`,
             });
+              await supabaseAdmin.from("push_delivery_attempts").insert({
+                user_id: p.userId,
+                medication_id: p.medId,
+                push_subscription_id: sub.id,
+                kind: p.kind,
+                http_status: resultado.status,
+                accepted: resultado.ok,
+                error: resultado.error ?? null,
+              } as never);
               if (resultado.ok) {
                 enviados += 1;
                 entregados += 1;
