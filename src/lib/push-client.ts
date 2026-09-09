@@ -33,7 +33,7 @@ export function dentroDeMarco(): boolean {
 
 export async function suscripcionActual(): Promise<PushSubscription | null> {
   if (!pushSoportado()) return null;
-  const registration = await navigator.serviceWorker.getRegistration(SW_URL);
+  const registration = await navigator.serviceWorker.getRegistration("/");
   if (!registration) return null;
   return registration.pushManager.getSubscription();
 }
@@ -68,6 +68,10 @@ export async function activarAvisos(): Promise<EstadoAviso> {
       p256dh: json.keys?.["p256dh"] ?? "",
       auth: json.keys?.["auth"] ?? "",
       userAgent: navigator.userAgent,
+      expirationTime: subscription.expirationTime
+        ? new Date(subscription.expirationTime).toISOString()
+        : null,
+      serviceWorkerScope: registration.scope,
     },
   });
   return "activado";

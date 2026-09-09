@@ -10,6 +10,8 @@ type SubscriptionInput = {
   p256dh: string;
   auth: string;
   userAgent?: string;
+  expirationTime?: string | null;
+  serviceWorkerScope?: string;
 };
 
 function validateSubscription(input: SubscriptionInput): SubscriptionInput {
@@ -20,6 +22,8 @@ function validateSubscription(input: SubscriptionInput): SubscriptionInput {
     p256dh: input.p256dh.slice(0, 200),
     auth: input.auth.slice(0, 100),
     userAgent: (input.userAgent ?? "").slice(0, 200),
+    expirationTime: input.expirationTime ?? null,
+    serviceWorkerScope: (input.serviceWorkerScope ?? "").slice(0, 500),
   };
 }
 
@@ -36,6 +40,8 @@ export const savePushSubscription = createServerFn({ method: "POST" })
         user_agent: data.userAgent ?? null,
         last_seen_at: new Date().toISOString(),
         last_error: null,
+        expiration_time: data.expirationTime,
+        service_worker_scope: data.serviceWorkerScope || null,
       } as never,
       { onConflict: "endpoint" },
     );
@@ -63,22 +69,38 @@ export const sendTestPush = createServerFn({ method: "POST" })
 
     const { data, error } = await context.supabase
       .from("push_subscriptions")
-      .select("endpoint, p256dh, auth");
+      .select("id, endpoint, p256dh, auth");
     if (error) throw new Error(error.message);
 
-    const targets = (data ?? []) as { endpoint: string; p256dh: string; auth: string }[];
+    const targets = (data ?? []) as { id: string; endpoint: string; p256dh: string; auth: string }[];
     let sent = 0;
+    const results: { ok: boolean; status: number; gone: boolean }[] = [];
     for (const target of targets) {
       const result = await sendWebPush(target, {
-        title: "Aviso de prueba",
-        body: "Así te avisaremos cuando llegue la hora de tu medicamento.",
+        title: "🔔 Prueba de Pastillero Digital",
+        body: "Este aviso fue enviado por el servidor, sin depender de una dosis.",
         url: "/inicio",
         tag: "prueba",
       });
+      results.push({ ok: result.ok, status: result.status, gone: result.gone });
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.from("push_delivery_attempts").insert({
+        user_id: context.userId,
+        push_subscription_id: target.id,
+        kind: "test",
+        http_status: result.status,
+        accepted: result.ok,
+        error: result.error ?? null,
+      } as never);
       if (result.ok) sent += 1;
       else if (result.gone) {
         await context.supabase.from("push_subscriptions").delete().eq("endpoint", target.endpoint);
+      } else {
+        await context.supabase
+          .from("push_subscriptions")
+          .update({ last_error: result.error ?? `HTTP ${result.status}` } as never)
+          .eq("endpoint", target.endpoint);
       }
     }
-    return { sent, total: targets.length, configured: true };
+    return { sent, total: targets.length, configured: true, results };
   });

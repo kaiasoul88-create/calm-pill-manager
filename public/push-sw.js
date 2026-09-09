@@ -20,6 +20,10 @@ self.addEventListener("push", (event) => {
     silent: false,
     requireInteraction: true,
     vibrate: [200, 100, 200],
+    actions: [
+      { action: "taken", title: "YA LO TOMÉ" },
+      { action: "snooze", title: "RECORDAR MÁS TARDE" },
+    ],
     data: { url: data.url || "/inicio" },
   };
 
@@ -28,7 +32,9 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const url = (event.notification.data && event.notification.data.url) || "/inicio";
+  const baseUrl = (event.notification.data && event.notification.data.url) || "/inicio";
+  const separator = baseUrl.includes("?") ? "&" : "?";
+  const url = event.action ? `${baseUrl}${separator}accion=${encodeURIComponent(event.action)}` : baseUrl;
   event.waitUntil(
     (async () => {
       const ventanas = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
