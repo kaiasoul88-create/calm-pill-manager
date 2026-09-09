@@ -199,15 +199,68 @@ export type Database = {
         }
         Relationships: []
       }
+      push_delivery_attempts: {
+        Row: {
+          accepted: boolean
+          attempted_at: string
+          error: string | null
+          http_status: number
+          id: string
+          kind: string
+          medication_id: string | null
+          push_subscription_id: string | null
+          user_id: string
+        }
+        Insert: {
+          accepted?: boolean
+          attempted_at?: string
+          error?: string | null
+          http_status: number
+          id?: string
+          kind: string
+          medication_id?: string | null
+          push_subscription_id?: string | null
+          user_id: string
+        }
+        Update: {
+          accepted?: boolean
+          attempted_at?: string
+          error?: string | null
+          http_status?: number
+          id?: string
+          kind?: string
+          medication_id?: string | null
+          push_subscription_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_delivery_attempts_medication_id_fkey"
+            columns: ["medication_id"]
+            isOneToOne: false
+            referencedRelation: "medications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "push_delivery_attempts_push_subscription_id_fkey"
+            columns: ["push_subscription_id"]
+            isOneToOne: false
+            referencedRelation: "push_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       push_subscriptions: {
         Row: {
           auth: string
           created_at: string
           endpoint: string
+          expiration_time: string | null
           id: string
           last_error: string | null
           last_seen_at: string
           p256dh: string
+          service_worker_scope: string | null
           user_agent: string | null
           user_id: string
         }
@@ -215,10 +268,12 @@ export type Database = {
           auth: string
           created_at?: string
           endpoint: string
+          expiration_time?: string | null
           id?: string
           last_error?: string | null
           last_seen_at?: string
           p256dh: string
+          service_worker_scope?: string | null
           user_agent?: string | null
           user_id: string
         }
@@ -226,10 +281,12 @@ export type Database = {
           auth?: string
           created_at?: string
           endpoint?: string
+          expiration_time?: string | null
           id?: string
           last_error?: string | null
           last_seen_at?: string
           p256dh?: string
+          service_worker_scope?: string | null
           user_agent?: string | null
           user_id?: string
         }
