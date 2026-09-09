@@ -68,17 +68,24 @@ export const sendTestPush = createServerFn({ method: "POST" })
 
     const targets = (data ?? []) as { endpoint: string; p256dh: string; auth: string }[];
     let sent = 0;
+    const results: { ok: boolean; status: number; gone: boolean }[] = [];
     for (const target of targets) {
       const result = await sendWebPush(target, {
-        title: "Aviso de prueba",
-        body: "Así te avisaremos cuando llegue la hora de tu medicamento.",
+        title: "🔔 Prueba de Pastillero Digital",
+        body: "Este aviso fue enviado por el servidor, sin depender de una dosis.",
         url: "/inicio",
         tag: "prueba",
       });
+      results.push({ ok: result.ok, status: result.status, gone: result.gone });
       if (result.ok) sent += 1;
       else if (result.gone) {
         await context.supabase.from("push_subscriptions").delete().eq("endpoint", target.endpoint);
+      } else {
+        await context.supabase
+          .from("push_subscriptions")
+          .update({ last_error: result.error ?? `HTTP ${result.status}` } as never)
+          .eq("endpoint", target.endpoint);
       }
     }
-    return { sent, total: targets.length, configured: true };
+    return { sent, total: targets.length, configured: true, results };
   });

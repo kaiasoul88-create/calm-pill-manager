@@ -211,15 +211,19 @@ export const Route = createFileRoute("/api/public/reminders/run")({
           } as never);
           if (yaEnviado) continue;
 
-          const cuerpo = `${p.nombre}${p.dosis ? ` · ${p.dosis}` : ""} · ${formatearHora(p.hora)}`;
+            const cuerpo = `${p.nombre}\n${p.dosis || "Dosis registrada"}`;
+            let entregados = 0;
           for (const sub of porUsuario.get(p.userId) ?? []) {
             const resultado = await sendWebPush(sub, {
               title: "💊 Es hora de tu medicamento",
               body: cuerpo,
-              url: "/inicio",
+                url: `/inicio?medicamento=${encodeURIComponent(p.medId)}&fecha=${encodeURIComponent(p.fecha)}&hora=${encodeURIComponent(p.hora)}`,
               tag: `${p.medId}-${p.fecha}-${p.hora}`,
             });
-            if (resultado.ok) enviados += 1;
+              if (resultado.ok) {
+                enviados += 1;
+                entregados += 1;
+              }
             else if (resultado.gone) {
               await supabaseAdmin
                 .from("push_subscriptions")
@@ -232,6 +236,18 @@ export const Route = createFileRoute("/api/public/reminders/run")({
                 .eq("endpoint", sub.endpoint);
             }
           }
+            // Si ningún servicio Push aceptó el aviso, libera la marca para reintentar
+            // en la siguiente ejecución dentro de la ventana de diez minutos.
+            if (entregados === 0) {
+              await supabaseAdmin
+                .from("reminder_sends")
+                .delete()
+                .eq("user_id", p.userId)
+                .eq("medication_id", p.medId)
+                .eq("scheduled_date", p.fecha)
+                .eq("scheduled_time", p.hora)
+                .eq("kind", p.kind);
+            }
         }
 
         return Response.json({ ok: true, enviados, revisados: pendientes.length });

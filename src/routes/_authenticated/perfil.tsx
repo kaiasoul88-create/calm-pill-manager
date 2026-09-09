@@ -195,9 +195,19 @@ function Perfil() {
             type="button"
             disabled={ocupado}
             onClick={async () => {
-              const r = await sendTestPush({ data: undefined });
-              if (r.sent > 0) toast.success("Te enviamos un aviso de prueba.");
-              else toast.error("No pudimos enviar el aviso de prueba.");
+              setOcupado(true);
+              try {
+                const r = await sendTestPush({ data: undefined });
+                const accepted = r.results?.some((result) => result.ok);
+                if (r.sent > 0 && accepted) {
+                  toast.success("El servicio de tu teléfono aceptó el aviso de prueba.");
+                } else {
+                  const status = r.results?.[0]?.status;
+                  toast.error(status ? `El servicio rechazó el aviso (HTTP ${status}).` : "No pudimos enviar el aviso de prueba.");
+                }
+              } finally {
+                setOcupado(false);
+              }
             }}
             className="mt-3 min-h-14 w-full rounded-xl border-2 border-input bg-background text-lg font-semibold"
           >
